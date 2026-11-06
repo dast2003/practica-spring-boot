@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "Prueba Tecnica - Parqueadero",
+    "description": "Escenarios obligatorios de la prueba. Ejecutar en orden con ambos servicios arriba (8081 y 8082). Para el escenario 503, detener vehiculo-service y ejecutar la última petición.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "vehiculos", "value": "http://localhost:8081" },
+    { "key": "pagos", "value": "http://localhost:8082" }
+  ],
+  "item": [
+    {
+      "name": "1. vehiculo-service",
+      "item": [
+        {
+          "name": "Registrar carro ABC123",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('201 Created', () => pm.response.to.have.status(201));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"placa\": \"ABC123\",\n  \"marca\": \"Chevrolet\",\n  \"modelo\": \"2020\",\n  \"tipo\": \"CARRO\",\n  \"numeroPuertas\": 4\n}" },
+            "url": "{{vehiculos}}/api/vehiculos"
+          }
+        },
+        {
+          "name": "Registrar carro DEF456",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('201 Created', () => pm.response.to.have.status(201));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"placa\": \"DEF456\",\n  \"marca\": \"Mazda\",\n  \"modelo\": \"2022\",\n  \"tipo\": \"CARRO\",\n  \"numeroPuertas\": 5\n}" },
+            "url": "{{vehiculos}}/api/vehiculos"
+          }
+        },
+        {
+          "name": "Registrar moto XYZ45A",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('201 Created', () => pm.response.to.have.status(201));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"placa\": \"XYZ45A\",\n  \"marca\": \"Yamaha\",\n  \"modelo\": \"2023\",\n  \"tipo\": \"MOTO\",\n  \"cilindraje\": 150\n}" },
+            "url": "{{vehiculos}}/api/vehiculos"
+          }
+        },
+        {
+          "name": "Registrar moto QWE12B",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('201 Created', () => pm.response.to.have.status(201));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"placa\": \"QWE12B\",\n  \"marca\": \"Honda\",\n  \"modelo\": \"2021\",\n  \"tipo\": \"MOTO\",\n  \"cilindraje\": 125\n}" },
+            "url": "{{vehiculos}}/api/vehiculos"
+          }
+        },
+        {
+          "name": "Registrar placa duplicada (409)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('409 Conflict', () => pm.response.to.have.status(409));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"placa\": \"ABC123\",\n  \"marca\": \"Chevrolet\",\n  \"modelo\": \"2020\",\n  \"tipo\": \"CARRO\",\n  \"numeroPuertas\": 4\n}" },
+            "url": "{{vehiculos}}/api/vehiculos"
+          }
+        },
+        {
+          "name": "Registrar datos inválidos (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"placa\": \"GHI789\",\n  \"marca\": \"Kia\",\n  \"modelo\": \"2020\",\n  \"tipo\": \"CARRO\"\n}" },
+            "url": "{{vehiculos}}/api/vehiculos"
+          }
+        },
+        {
+          "name": "Listar vehículos",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"] } }],
+          "request": { "method": "GET", "header": [], "url": "{{vehiculos}}/api/vehiculos" }
+        },
+        {
+          "name": "Buscar placa existente",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.test('Placa ABC123', () => pm.expect(pm.response.json().placa).to.eql('ABC123'));"] } }],
+          "request": { "method": "GET", "header": [], "url": "{{vehiculos}}/api/vehiculos/ABC123" }
+        },
+        {
+          "name": "Buscar placa inexistente (404)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('404 Not Found', () => pm.response.to.have.status(404));"] } }],
+          "request": { "method": "GET", "header": [], "url": "{{vehiculos}}/api/vehiculos/NOP999" }
+        },
+        {
+          "name": "Estadísticas",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "const b = pm.response.json();", "pm.test('Tiene totales', () => { pm.expect(b).to.have.property('totalVehiculos'); pm.expect(b).to.have.property('totalCarros'); pm.expect(b).to.have.property('totalMotos'); });"] } }],
+          "request": { "method": "GET", "header": [], "url": "{{vehiculos}}/api/vehiculos/estadisticas" }
+        },
+        {
+          "name": "Actualizar vehículo DEF456",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.test('Modelo actualizado', () => pm.expect(pm.response.json().modelo).to.eql('2024'));"] } }],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"marca\": \"Mazda\",\n  \"modelo\": \"2024\",\n  \"tipo\": \"CARRO\",\n  \"numeroPuertas\": 4\n}" },
+            "url": "{{vehiculos}}/api/vehiculos/DEF456"
+          }
+        },
+        {
+          "name": "Eliminar vehículo QWE12B",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('204 No Content', () => pm.response.to.have.status(204));"] } }],
+          "request": { "method": "DELETE", "header": [], "url": "{{vehiculos}}/api/vehiculos/QWE12B" }
+        }
+      ]
+    },
+    {
+      "name": "2. pago-service",
+      "item": [
+        {
+          "name": "Calcular 3 horas carro (15.000)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "const b = pm.response.json();", "pm.test('Total 15000 COP', () => { pm.expect(b.totalPagar).to.eql(15000); pm.expect(b.valorHora).to.eql(5000); pm.expect(b.moneda).to.eql('COP'); });"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"placa\": \"ABC123\", \"horas\": 3 }" },
+            "url": "{{pagos}}/api/pagos/calcular"
+          }
+        },
+        {
+          "name": "Calcular 3 horas moto (9.000)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.test('Total 9000 COP', () => pm.expect(pm.response.json().totalPagar).to.eql(9000));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"placa\": \"XYZ45A\", \"horas\": 3 }" },
+            "url": "{{pagos}}/api/pagos/calcular"
+          }
+        },
+        {
+          "name": "Calcular horas negativas (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"placa\": \"ABC123\", \"horas\": -2 }" },
+            "url": "{{pagos}}/api/pagos/calcular"
+          }
+        },
+        {
+          "name": "Calcular placa inexistente (404)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('404 Not Found', () => pm.response.to.have.status(404));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"placa\": \"NOP999\", \"horas\": 3 }" },
+            "url": "{{pagos}}/api/pagos/calcular"
+          }
+        },
+        {
+          "name": "BONUS: vehiculo-service caído (503) - detener 8081 antes",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('503 Service Unavailable', () => pm.response.to.have.status(503));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"placa\": \"ABC123\", \"horas\": 3 }" },
+            "url": "{{pagos}}/api/pagos/calcular"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+package com.parqueadero.vehiculo.domain.model;
+
+public enum TipoVehiculo {
+    CARRO,
+    MOTO
+}
